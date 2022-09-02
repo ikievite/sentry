@@ -1,0 +1,63 @@
+!
+!command in config_mode first-step
+ip dhcp client mode normal
+spanning-tree mode rstp
+!
+!command in enable_mode
+user login radius-local server-no-response
+user name admin password cipher $@!!104af664bc4b7406503caac381f59818 conf
+radius 192.168.51.251
+radius-encrypt-key "RADIUS_SECRET"
+hostname test1000
+clock timezone + 2 0 Kyiv
+clock summer-time enable
+clock summer-time recurring last sun 3 3 0 last sun 10 4 0 60
+!
+!command in vlan configuration mode
+!
+vlan 102
+ name mgmt
+vlan 120
+ name subscribers
+!
+!command in vlan interface mode
+!
+interface vlan 102
+ description MGMT
+ ip address 10.0.0.5 255.255.255.0
+!
+!command in config_mode
+transceiver ddm enable
+snmp-server location test_site
+snmp-server contact mail@company.name
+snmp-server community encryption SNMP_RO_COMMUNITY ro
+no snmp-server community public
+no snmp-server community private
+ip route 0.0.0.0 0.0.0.0 10.0.0.1
+command-log enable
+logging time-stamp debug datetime
+logging sequence-number
+logging buffered 7
+logging host 192.168.51.250 7
+logging host 192.168.51.250 facility local6
+sntp server 192.168.51.251
+lldp enable
+ssh2 server authentication-retries 3
+auto-update disable
+banner enable
+ip dhcp snooping
+ip dhcp snooping information option
+ip arp-inspection dhcp-snooping
+ip arp-inspection vlan 120
+ip verify source dhcp
+ip dhcp information option circuit-id hex 0004%v%u%p
+!command in multi_line 262
+banner login @
+
+ISP CompanyName Ltd. +1-541-754-3010 mail at company.name
+Access to this device or the attached networks is prohibited
+without express written permission.
+Violators will be prosecuted to the fullest extent of both civil
+and criminal law.
+@
+!

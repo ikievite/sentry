@@ -1,5 +1,10 @@
+from sentry.send_serial import send_serial
+
+
 def main():
-    print("hello")
+    with open("cfg.txt") as f:
+        config = f.read()
+    send_serial(config)
 
 
 if __name__ == "__main__":
