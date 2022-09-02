@@ -1,7 +1,10 @@
-import serial
+"""Send commands to device."""
+
+
 import sys
 import time
 
+import serial
 
 port = "/dev/ttyUSB0"
 bps = 9600
@@ -10,16 +13,27 @@ READ_TIMEOUT = 8
 
 
 def to_bytes(line=""):
+    """
+    Convert line to bytes.
+
+    Args:
+        line: text line
+
+    Returns:
+        bytes line
+    """
     return f"{line}\n".encode("utf-8")
 
 
 def read_serial(console):
     """
-    Check if there is data waiting to be read
+    Check if there is data waiting to be read. Read and return it, else return null string.
 
-    Read and return it.
+    Args:
+        console: console connection
 
-    else return null string
+    Returns:
+        data waiting to be read
     """
     data_bytes = console.in_waiting
     if data_bytes:
@@ -30,7 +44,13 @@ def read_serial(console):
 
 def check_logged_in(console):
     """
-    Check if logged in to switch
+    Check if logged in to switch.
+
+    Args:
+        console: console connection
+
+    Returns:
+        status is logged
     """
     console.write(to_bytes("\n"))
     time.sleep(1)
@@ -43,7 +63,10 @@ def check_logged_in(console):
 
 def login(console):
     """
-    Login to switch
+    Login to switch.
+
+    Args:
+        console: console connection
     """
     login_status = check_logged_in(console)
     if login_status:
@@ -73,7 +96,10 @@ def login(console):
 
 def logout(console):
     """
-    Exit from console session
+    Exit from console session.
+
+    Args:
+        console: console connection
     """
     print("Logging out from switch")
     while check_logged_in(console):
@@ -85,7 +111,14 @@ def logout(console):
 
 def send_command(console, cmd=""):
     """
-    Send a command down the channel
+    Send a command down the channel.
+
+    Args:
+        console: console connection
+        cmd: command`s string
+
+    Returns:
+        applied command
 
     Return the output
     """
@@ -95,6 +128,12 @@ def send_command(console, cmd=""):
 
 
 def send_serial(config):
+    """
+    Send commands to device via serial port.
+
+    Args:
+        config: device`s commands
+    """
     print("\nInitializing serial connection")
 
     console = serial.Serial(
