@@ -1,10 +1,13 @@
 """Send commands to device."""
 
 
+import logging
 import sys
 import time
 
 import serial
+
+logger = logging.getLogger(__name__)
 
 port = "/dev/ttyUSB0"
 bps = 9600
@@ -38,8 +41,7 @@ def read_serial(console):
     data_bytes = console.in_waiting
     if data_bytes:
         return console.read(data_bytes)
-    else:
-        return ""
+    return ""
 
 
 def check_logged_in(console):
@@ -57,8 +59,7 @@ def check_logged_in(console):
     prompt = read_serial(console)
     if b">" in prompt or b"#" in prompt:
         return True
-    else:
-        return False
+    return False
 
 
 def login(console):
@@ -70,10 +71,10 @@ def login(console):
     """
     login_status = check_logged_in(console)
     if login_status:
-        print("Already logged in")
+        logger.debug("Already logged in")
         return None
 
-    print("Logging into switch")
+    logger.debug("Logging into switch")
     while True:
         console.write(to_bytes())
         time.sleep(1)
@@ -90,7 +91,7 @@ def login(console):
 
         login_status = check_logged_in(console)
         if login_status:
-            print("We are logged in\n")
+            logger.debug("We are logged in")
             break
 
 
@@ -101,12 +102,12 @@ def logout(console):
     Args:
         console: console connection
     """
-    print("Logging out from switch")
+    logger.debug("Logging out from switch")
     while check_logged_in(console):
         console.write(to_bytes("exit"))
         time.sleep(0.5)
 
-    print("Successfully logged out from switcc")
+    logger.debug("Successfully logged out from switch")
 
 
 def send_command(console, cmd=""):
@@ -134,7 +135,7 @@ def send_serial(config):
     Args:
         config: device`s commands
     """
-    print("\nInitializing serial connection")
+    logger.debug("Initializing serial connection")
 
     console = serial.Serial(
         port=port,
@@ -150,6 +151,6 @@ def send_serial(config):
 
     login(console)
     for line in config.split("\n"):
-        print(send_command(console, cmd=line))
+        logger.debug(send_command(console, cmd=line))
 
     logout(console)
