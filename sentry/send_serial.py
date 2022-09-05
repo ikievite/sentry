@@ -44,7 +44,7 @@ def read_serial(console):
     return ""
 
 
-def check_logged_in(console):
+def is_logged_in(console):
     """
     Check if logged in to switch.
 
@@ -57,9 +57,7 @@ def check_logged_in(console):
     console.write(to_bytes("\n"))
     time.sleep(1)
     prompt = read_serial(console)
-    if b">" in prompt or b"#" in prompt:
-        return True
-    return False
+    return bool(b">" in prompt or b"#" in prompt)
 
 
 def login(console):
@@ -69,28 +67,26 @@ def login(console):
     Args:
         console: console connection
     """
-    login_status = check_logged_in(console)
-    if login_status:
+    if is_logged_in(console):
         logger.debug("Already logged in")
-        return None
+        return
 
     logger.debug("Logging into switch")
     while True:
         console.write(to_bytes())
         time.sleep(1)
         input_data = read_serial(console)
-        if not b"Login" in input_data:
+        if b"Login" not in input_data:
             continue
         console.write(to_bytes("raisecom"))
         time.sleep(1)
         input_data = read_serial(console)
-        if not b"Password" in input_data:
+        if b"Password" not in input_data:
             continue
         console.write(to_bytes("raisecom"))
         time.sleep(1)
 
-        login_status = check_logged_in(console)
-        if login_status:
+        if is_logged_in(console):
             logger.debug("We are logged in")
             break
 
@@ -103,7 +99,7 @@ def logout(console):
         console: console connection
     """
     logger.debug("Logging out from switch")
-    while check_logged_in(console):
+    while is_logged_in(console):
         console.write(to_bytes("exit"))
         time.sleep(0.5)
 
